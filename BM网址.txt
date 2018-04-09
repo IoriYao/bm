@@ -1,0 +1,133 @@
+
+在企业列表中指定查询第几页
+http://glxy.mot.gov.cn/BM/AdmitAction_jPublishList.do?loc=CorpList&view=N&pageNo=
+
+http://glxy.mot.gov.cn//BM/AdmitAction_jPublishList.do?loc=CorpList&corpname=&regProCode=&corpKind=&corpType=&aptitudeName=&aptitudeType=&aptitudeGrade=&view=N&pageNo=10
+
+
+查询企业的基本信息
+http://glxy.mot.gov.cn/BM/CptInfoAction_base.do?corpCode=
+
+/BM/CptInfoAction_frame.do?corpCode
+
+查询企业的主包
+http://glxy.mot.gov.cn/BM/CptInfoAction_indexCorpArchFrame.do?nodeType=MAINPRJ&corpCode=70913213-1
+
+
+查询企业的自己填的主包列表,注意分页
+http://glxy.mot.gov.cn/BM/CptInfoAction_outstandingQuery.do?corpCode=70913213-1&nodeType=MAINPRJ&pageNo=11
+
+
+主包已经审核
+http://glxy.mot.gov.cn/BM/CptInfoAction_outstandingShow.do?pageType=1&corpCode=70913213-1&keyWord=T201007271808454310013394
+	
+主包企业自己填的在建和已建总共
+http://glxy.mot.gov.cn/BM/CptInfoAction_outstandingShow.do?nodeType=MAIN_MADED&pageType=2&corpCode=70913213-1&keyWord=eb91e41b-7d61-4097-888a-15d29cd3cad0
+
+主包企业自己填的已建
+http://glxy.mot.gov.cn/BM/CptInfoAction_outstandingQuery.do?nodeType=MAIN_MADED&corpCode=70913213-1&pageNo=2
+
+查询具体某个项目
+http://glxy.mot.gov.cn/BM/CptInfoAction_outstandingShow.do?nodeType=MAIN_MADED&pageType=2&corpCode=70913213-1&keyWord=723eca39-80ca-41f8-9727-21faa3db5e76
+
+
+//以下js是
+
+	var ContextPath="/BM";
+
+	//基本信息
+	function OpenNodeA(id){
+		var url=ContextPath+"/CptInfoAction_base.do?corpCode="+id;
+		window.parent.record_handler.location=encodeURI(url);
+	}
+
+	//资质信息
+	function OpenNodeB(id){
+		var url=ContextPath+"/CptInfoAction_aptitude.do?corpCode="+id;
+		window.parent.record_handler.location=encodeURI(url);
+	}
+	
+	//人员信息
+	function OpenNodeC(id){
+		var url=ContextPath+"/CptInfoAction_personnelQuery.do?corpCode="+id;
+		window.parent.record_handler.location=encodeURI(url);
+	}
+	
+	// 财务信息
+	function OpenNodeD(id)
+	{
+		var url=ContextPath+"/CptInfoAction_financeQuery.do?corpcode="+id;
+		window.parent.record_handler.location=encodeURI(url);
+	}
+	
+	// 奖惩记录
+	function OpenNodeE(id)
+	{
+		var url=ContextPath+"/CorporationRAPAction_queryInfo.do?corpcode="+id;
+		window.parent.record_handler.location=encodeURI(url);
+	}
+	
+	// 良好行为记录
+	function OpenNodeEGood(id)
+	{
+		var url=ContextPath+"/CorporationRAPAction_queryIndexListGood.do?corpcode="+id;
+		window.parent.record_handler.location=encodeURI(url);
+	}
+	
+	// 不良好行为记录
+	function OpenNodeEBad(id)
+	{
+		var url=ContextPath+"/CorpPunishmentAction_queryIndexListBad.do?corpcode="+id;
+		window.parent.record_handler.location=encodeURI(url);
+	}
+	
+	// 信用等级
+	function OpenNodeF(id)
+	{
+		var url = ContextPath+"/CreditAction_corpList.do?corpcode="+id;
+		window.parent.record_handler.location=encodeURI(url);
+	}
+	
+	//业绩信息
+	function OpenNodeAche(id){
+		var url=ContextPath+"/CptInfoAction_indexCorpArchFrame.do?nodeType=ROOT&corpCode="+id;
+		window.parent.record_handler.location=encodeURI(url);
+	}
+	
+	//业绩信息:主包
+	function OpenNodeMain(id){
+		var url=ContextPath+"/CptInfoAction_indexCorpArchFrame.do?nodeType=MAINPRJ&corpCode="+id;
+		window.parent.record_handler.location=encodeURI(url);
+	}
+	
+	//已建
+	function OpenNodeMainA(id){
+		var url=ContextPath+"/CptInfoAction_indexCorpArchFrame.do?nodeType=MAIN_MADED&corpCode="+id;
+		window.parent.record_handler.location=encodeURI(url);
+	}
+	
+	//在建
+	function OpenNodeMainB(id){
+		var url=ContextPath+"/CptInfoAction_indexCorpArchFrame.do?nodeType=MAIN_MADING&corpCode="+id;
+		window.parent.record_handler.location=encodeURI(url);
+	}
+	
+	//业绩信息:分包
+	
+	function OpenNodePart(id){
+		var url=ContextPath+"/CptInfoAction_indexCorpArchFrame.do?nodeType=PARTPRJ&corpCode="+id;
+		window.parent.record_handler.location=encodeURI(url);
+	}
+	
+	//已建
+	function OpenNodePartA(id){
+		var url=ContextPath+"/CptInfoAction_indexCorpArchFrame.do?nodeType=PART_MADED&corpCode="+id;
+		window.parent.record_handler.location=encodeURI(url);
+	}
+	
+	//在建
+	function OpenNodePartB(id){
+		var url=ContextPath+"/CptInfoAction_indexCorpArchFrame.do?nodeType=PART_MADING&corpCode="+id;
+		window.parent.record_handler.location=encodeURI(url);
+	}
+	
