@@ -1,17 +1,21 @@
 import urllib2
-from bs4 import BeautifulSoup
-import MySQLdb
+import sys
+sys.path.append("C:\\Python27\\Lib\\site-packages")
 
-db = MySQLdb.connect('192.168.164.133','root','123456','demo')
+import MySQLdb
+db = MySQLdb.connect('127.0.0.1','root','root','demo')
 cursor = db.cursor()
 
 def query_all_main_maded(corpid):
-
+    from bs4 import BeautifulSoup
     url_pre = "http://glxy.mot.gov.cn/BM/CptInfoAction_outstandingQuery.do?nodeType=MAIN_MADED&corpCode="+corpid
     page_no = 1
     while True:
         url = url_pre + "&pageNo=" + str(page_no)
-        html = urllib2.urlopen(url)
+        try:
+            html = urllib2.urlopen(url,data=None, timeout=30)
+        except:
+            continue
         bsObj = BeautifulSoup(html, "html.parser")
         table_ele = bsObj.find('table')
         trs = table_ele.find_all('tr')
@@ -33,14 +37,14 @@ def query_all_main_maded(corpid):
         page_no += 1
     db.commit()
 
-sql = 'select corpid from corp_details'
+sql = 'select id from corp_details where id >= \"48500143-0\" order by id'
 try:
     cursor.execute(sql)
     results = cursor.fetchall()
     for row in results:
         corpid = row[0]
         query_all_main_maded(corpid)
-except:
-    print "Error: unable to fecth data"
+except Exception,e:
+    print e.message
 
 db.close
