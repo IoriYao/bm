@@ -42,5 +42,5 @@ class SqlWorker(object):
         ret = ''
         for key in info:
             if len(info[key]) > 0 and key != 'id':
-                ret += " %s='%s'," % (key, info[key])
+                ret += " %s='%s'," % (key, info[key].replace("'", "\\'").replace("\\", "\\\\"))
         return ret[0: len(ret) - 1]
