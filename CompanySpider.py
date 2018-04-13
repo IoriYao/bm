@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from HtmlSpider import HtmlSpider
 
-attrMap = {
+attr_map = {
     "组织机构代码:": "id",
     "企业名称:": "companyName",
     "注册省份:": "province",
@@ -24,11 +24,12 @@ attrMap = {
     # "营业范围:": "businessScope",
     # "资产构成情况及投资关联企业情况:": "assetInfo",
 }
+base_url = "http://glxy.mot.gov.cn/BM/CptInfoAction_base.do?corpCode=%s"
 
 
 class CompanySpider(HtmlSpider):
     def __init__(self, company_id):
-        super(CompanySpider, self).__init__("http://glxy.mot.gov.cn/BM/CptInfoAction_base.do?corpCode=%s" % company_id)
+        super(CompanySpider, self).__init__(base_url % company_id)
         company_info_table = self.html_doc.find(class_="infogrid")
         self.companyInfo = {}
         for tr in company_info_table.find_all("tr"):
@@ -36,9 +37,8 @@ class CompanySpider(HtmlSpider):
             for index in range(len(tds)):
                 if index % 2 == 0:
                     try:
-                        self.companyInfo[attrMap[tds[index].get_text().strip().encode("utf-8")]]\
+                        self.companyInfo[attr_map[tds[index].get_text().strip().encode("utf-8")]] \
                             = tds[index + 1].get_text().strip()
                     except:
                         continue
-        # print self.companyInfo
-
+        self.print_dict(self.companyInfo)

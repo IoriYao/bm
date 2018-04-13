@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from HtmlSpider import HtmlSpider
 
-attrMap = {
+attr_map = {
     "工程名称:": "projectName",
     "项目类型:": "projectType",
     "合同价(万元):": "orderAmount",
@@ -19,24 +19,21 @@ attrMap = {
     "项目代码:": "code",
     "主要工程量:": "projectQuantities",
 }
+base_url = "http://glxy.mot.gov.cn/BM/CptInfoAction_outstandingShow.do?nodeType=MAINPRJ&pageType=2&corpCode=%s&keyWord=%s"
 
 
 class ProjectSpider(HtmlSpider):
     def __init__(self, company_id, project_id):
-        super(ProjectSpider, self).__init__(
-            "http://glxy.mot.gov.cn/BM/CptInfoAction_outstandingShow.do?nodeType=MAINPRJ&pageType=2&corpCode=%s&keyWord=%s" % (
-            company_id, project_id))
+        super(ProjectSpider, self).__init__(base_url % (company_id, project_id))
         company_info_table = self.html_doc.find(class_="infogrid")
-        print(company_info_table)
         self.projectInfo = {}
         for tr in company_info_table.find_all("tr"):
             tds = tr.find_all("td")
             for index in range(len(tds)):
                 if index % 2 == 0:
-                    print "\"%s\":" % tds[index].get_text().strip().encode("utf-8")
                     try:
-                        self.projectInfo[attrMap[tds[index].get_text().strip().encode("utf-8")]] \
+                        self.projectInfo[attr_map[tds[index].get_text().strip().encode("utf-8")]] \
                             = tds[index + 1].get_text().strip()
                     except:
                         continue
-        print self.projectInfo
+        self.print_dict(self.projectInfo)

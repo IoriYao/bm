@@ -1,22 +1,13 @@
-import MySQLdb
-
 from ProjectSpider import ProjectSpider
 from SqlWorker import SqlWorker
-
-db = MySQLdb.connect('101.132.159.215', 'yuyao', 'yy123123', 'demo')
-db.set_character_set('utf8')
-cursor = db.cursor()
 
 
 class ProjectWorker:
     def __init__(self):
-        cursor.execute("select corpid,proj_id,proj_type  from corp_proj;")
-        records = cursor.fetchall()
+        self.sqlWorker = SqlWorker('corp_proj')
+        records = self.sqlWorker.query(columns='id,corpid,proj_id,proj_type',
+                                       condition='projectName is NULL')
         for item in records:
             print item
-            spider = ProjectSpider(item[0], item[1])
-            sql = "update corp_details set %s  where id='%s'" % (SqlWorker.map_to_sql(spider.projectInfo), item[0])
-            print sql
-            # cursor.execute(sql)
-        db.commit()
-        db.close()
+            spider = ProjectSpider(item[1], item[2])
+            self.sqlWorker.save(condition="id='%s'" % item[0], record=spider.projectInfo)
