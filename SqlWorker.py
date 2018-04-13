@@ -26,8 +26,8 @@ class SqlWorker(object):
             self.cursor.close()
             self.cursor = self.db.cursor()
 
-    def query(self, columns, condition):
-        sql = "select %s  from %s where %s limit 1000;" % (columns, self.table, condition)
+    def query(self, columns, condition, limit=1000):
+        sql = "select %s  from %s where %s limit %s;" % (columns, self.table, condition, limit)
         print sql
         self.cursor.execute(sql)
         return self.cursor.fetchall()
