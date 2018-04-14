@@ -9,6 +9,11 @@ export default {
     projects: {},
     currentCompany: {},
     companyCount: 0,
+    companyFilters: [
+      { name: '企业名称', operator: '', value: ''},
+      { name: '企业名称', operator: '', value: ''},
+      { name: '企业名称', operator: '', value: ''},
+    ]
   },
 
   subscriptions: {
@@ -70,6 +75,9 @@ export default {
     },
     saveCurrentCompany(state, action) {
       return {...state, currentCompany: action.payload}
+    },
+    saveCompanyFilter(state, action) {
+      return {...state, companyFilters: action.payload}
     }
   },
 
