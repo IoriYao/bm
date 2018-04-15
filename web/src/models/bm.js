@@ -1,5 +1,6 @@
 
 import request from "../utils/request";
+import IndexPage from "../routes/IndexPage";
 let pageSize = 50
 export default {
   namespace: 'bm',
@@ -10,9 +11,7 @@ export default {
     currentCompany: {},
     companyCount: 0,
     companyFilters: [
-      { name: '企业名称', operator: '', value: ''},
-      { name: '企业名称', operator: '', value: ''},
-      { name: '企业名称', operator: '', value: ''},
+      { name: '企业名称', operator: 'contains', value: ''},
     ]
   },
 
@@ -55,6 +54,27 @@ export default {
         }
       });
     },
+    *queryCompany({ payload }, { call, put }) {
+      let condition = ''
+      console.log(payload)
+      payload.forEach((filter, i) => {
+        if (i > 0) condition += ' AND'
+        if (filter.operator === 'contains') {
+          condition += ` ${IndexPage.attrMap[filter.name]} like '%${filter.value}%' `
+        } else {
+          condition += ` ${IndexPage.attrMap[filter.name]}${filter.operator}'${filter.value}'`
+        }
+      })
+      console.log(`select * from corp_details where ${condition};`)
+      let response = yield call(request, {
+        sql: `select * from corp_details where ${condition};`
+      })
+      console.log(response)
+      yield put({
+        type: 'saveCompanies',
+        payload: response.data
+      });
+    }
   },
 
   reducers: {
@@ -78,7 +98,7 @@ export default {
     },
     saveCompanyFilter(state, action) {
       return {...state, companyFilters: action.payload}
-    }
+    },
   },
 
 };
