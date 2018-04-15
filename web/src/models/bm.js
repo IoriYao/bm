@@ -9,9 +9,9 @@ export default {
     companies: [],
     projects: {},
     currentCompany: {},
-    companyCount: 0,
+    companyCount: 1000,
     companyFilters: [
-      { name: '企业名称', operator: 'contains', value: ''},
+      { name: '注册省份', operator: 'contains', value: ''},
     ]
   },
 
@@ -68,6 +68,44 @@ export default {
       console.log(`select * from corp_details where ${condition};`)
       let response = yield call(request, {
         sql: `select * from corp_details where ${condition};`
+      })
+      console.log(response)
+      yield put({
+        type: 'saveCompanies',
+        payload: response.data
+      });
+    },
+    *queryCompanyByType({ payload }, { call, put }) {
+      console.log(payload)
+      let condition = ''
+      console.log(payload)
+      payload.companyFilters.forEach((filter, i) => {
+        if (filter.value === undefined || filter.value === '') return
+        condition += ' AND'
+        if (filter.operator === 'contains') {
+          condition += ` corp_details.${IndexPage.attrMap[filter.name]} like '%${filter.value}%' `
+        } else {
+          condition += ` corp_details.${IndexPage.attrMap[filter.name]}${filter.operator}'${filter.value}'`
+        }
+      })
+      let countSql = `select count(*) from (select * from corp_details,
+        (select * from (select corpid,sum(roadLen) as totalLen from corp_proj where projectTypeEnum >=${payload.roadLevel} and roadType = ${payload.roadMaterial} group by corpid) as temp  where totalLen > ${payload.roadLen})
+        as temp0 where corp_details.id = temp0.corpid ${condition}) as temp1;`
+      let response = yield call(request, {
+        sql: countSql
+      })
+      console.log(response)
+      yield put({
+        type: 'saveCompanyCount',
+        payload: response.data[0]['count(*)']
+      });
+      let sql = `select * from corp_details,
+        (select * from (select corpid,sum(roadLen) as totalLen from corp_proj where projectTypeEnum >=${payload.roadLevel} and roadType = ${payload.roadMaterial} group by corpid) as temp  where totalLen > ${payload.roadLen})
+        as temp0 where corp_details.id = temp0.corpid ${condition} limit ${(payload.pagination.current - 1 )* payload.pagination.pageSize},${payload.pagination.pageSize};`
+      console.log(sql)
+
+      response = yield call(request, {
+        sql: sql
       })
       console.log(response)
       yield put({

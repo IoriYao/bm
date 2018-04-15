@@ -77,7 +77,7 @@ class ProjectsPage extends React.Component {
       </Row>)
     }
     return (
-      <div style={{width: '60%', height: '100%', paddingTop: 16}}>
+      <div style={{width: '80%', height: '100%', paddingTop: 16}}>
         <iframe src={`http://glxy.mot.gov.cn/BM/CptInfoAction_base.do?corpCode=${currentCompany.id}`}
                 style={{width: '100%', height: this.state.iframeHeigh, border: 'none'}}
                 ref={ref => this.iframe = ref}

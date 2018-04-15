@@ -11,7 +11,7 @@ class ProjectWorker:
     def __init__(self):
         self.sqlWorker = SqlWorker('corp_proj')
         records = self.sqlWorker.query(columns='id,corpid,proj_id,proj_type',
-                                       condition='projectName is NULL', limit=10000)
+                                       condition='projectName is not NULL', limit=100)
         print len(records)
         global thread_count
         if len(records) > 20:
