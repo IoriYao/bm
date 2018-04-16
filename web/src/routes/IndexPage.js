@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'dva';
-import {Button, Card, Col, Divider, Layout, Row, Table, Select, Input, InputNumber} from "antd";
+import {Button, Card, Col, Divider, Layout, Row, Table, Select, Input, InputNumber, DatePicker} from "antd";
 import * as moment from "moment";
 import {routerRedux} from "dva/router";
 
@@ -85,6 +85,10 @@ class IndexPage extends React.Component {
         roadLevel: this.state.roadLevel,
         roadMaterial: this.state.roadMaterial,
         roadLen: this.state.roadLen,
+        endDate: this.state.endDate,
+        cptName: this.state.cptName,
+        cptType: this.state.cptType,
+        cptLevel: this.state.cptLevel
       }
     })
   }
@@ -126,7 +130,7 @@ class IndexPage extends React.Component {
     })
     let rows = []
     for (let i = 0; i < filterColumns.length; i += 2) {
-      rows.push(<Row key={i} style={{marginTop: 12}}>
+      rows.push(<Row key={i} style={{marginBottom: 12}}>
         {filterColumns[i]}
         {i + 1 < filterColumns.length ? filterColumns[i + 1] : null}
       </Row>)
@@ -137,27 +141,29 @@ class IndexPage extends React.Component {
   render() {
     let { bm: { companyFilters, companyCount }, dispatch} = this.props
     return (
-      <div style={{width: '80%', height: '100%', paddingTop: 16, marginBottom: 16}}>
-        <Card title="条件查询" bordered={true} style={{ width: '100%', marginBottom: 16 }}>
+      <div style={{height: '100%', paddingTop: 16, marginBottom: 16}}>
+        <Card bordered={true} style={{ width: '100%', marginBottom: 16 }}>
+          <div style={{display: 'flex', alignItems: 'center'}}>
+            <div style={{whiteSpace: 'nowrap', marginRight: 12}}>项目筛选条件</div>
+            <Divider/>
+          </div>
           <Row>
-            <Col span={8} style={{paddingRight: 8}}>
+            <Col span={12} style={{paddingBottom: 8, display: 'flex'}}>
+              <Select defaultValue="0"
+                      style={{ flex: 3, marginRight: 5 }}
+                      onChange={value => this.setState({roadType: value})}>
+                <Select.Option value="0">公路</Select.Option>
+                <Select.Option value="1" disabled>桥梁</Select.Option>
+                <Select.Option value="2" disabled>隧道</Select.Option>
+              </Select>
               <Input
-                addonBefore={
-                  <Select defaultValue="0"
-                          style={{width: '100'}}
-                          onChange={value => this.setState({roadType: value})}>
-                    <Select.Option value="0">公路</Select.Option>
-                    <Select.Option value="1" disabled>桥梁</Select.Option>
-                    <Select.Option value="2" disabled>隧道</Select.Option>
-                  </Select>
-                }
                 type='number'
-                style={{width: '100%'}}
+                style={{flex: 7}}
                 addonAfter="km"
                 onChange={event => this.setState({roadLen: event.target.value})}/>
             </Col>
-            <Col span={8}
-                 style={{display: 'flex', alignItems: 'center', paddingLeft: 8, paddingRight: 8}}>
+            <Col span={12}
+                 style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
               <span>等级要求：</span>
               <Select defaultValue="70" style={{ flex: 1 }}
                       onChange={value => this.setState({roadLevel: value})}>
@@ -169,7 +175,9 @@ class IndexPage extends React.Component {
                 <Select.Option value="50">无要求</Select.Option>
               </Select>
             </Col>
-            <Col span={8} style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
+          </Row>
+          <Row>
+            <Col span={12} style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
               <span>公路类型：</span>
               <Select defaultValue="0" style={{ flex: 1 }}
                       onChange={value => this.setState({roadMaterial: value})}>
@@ -177,9 +185,58 @@ class IndexPage extends React.Component {
                 <Select.Option value="1">水泥路</Select.Option>
               </Select>
             </Col>
+            <Col span={12} style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
+              <span>交工日期：</span>
+              <DatePicker style={{flex: 1}}
+                          onChange={date=>this.setState({endDate: date.format('yyyy-MM-DD')})} />
+            </Col>
           </Row>
+          <div style={{display: 'flex', alignItems: 'center', marginTop: 18}}>
+            <div style={{whiteSpace: 'nowrap', marginRight: 12}}>资质筛选条件</div>
+            <Divider/>
+          </div>
+          <Row>
+            <Col span={8}
+                 style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
+              <span>资质名称：</span>
+              <Select style={{ flex: 1 }}
+                      onChange={value => this.setState({cptName: value})}>
+                {
+                  IndexPage.CptTitles.map((title, i) =>
+                    <Select.Option value={title} key={i}>{title}</Select.Option>)
+                }
+              </Select>
+            </Col>
+            <Col span={8}
+                 style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
+              <span>资质类型：</span>
+              <Select defaultValue="" style={{ flex: 1 }}
+                      onChange={value => this.setState({cptType: value})}>
+                <Select.Option value="总承包">总承包</Select.Option>
+                <Select.Option value="专业承包">专业承包</Select.Option>
+                <Select.Option value="">无</Select.Option>
+              </Select>
+            </Col>
+            <Col span={8}
+                 style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
+              <span>资质级别：</span>
+              <Select defaultValue="0" style={{ flex: 1 }}
+                      onChange={value => this.setState({cptLevel: value})}>
+                <Select.Option value="100">特级</Select.Option>
+                <Select.Option value="90">一级</Select.Option>
+                <Select.Option value="80">二级</Select.Option>
+                <Select.Option value="70">三级</Select.Option>
+                <Select.Option value="60">不分等级</Select.Option>
+                <Select.Option value="0">无</Select.Option>
+              </Select>
+            </Col>
+          </Row>
+          <div style={{display: 'flex', alignItems: 'center', marginTop: 18}}>
+            <div style={{whiteSpace: 'nowrap', marginRight: 12}}>基本属性筛选</div>
+            <Divider/>
+          </div>
           {this.renderFilters()}
-          <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', marginTop: 12}}>
+          <div style={{width: '100%', display: 'flex', justifyContent: 'space-between'}}>
             <Button icon="plus" type="primary" onClick={() => {
               companyFilters.push({ name: '注册省份', operator: '=', value: ''})
               dispatch({type: 'bm/saveCompanyFilter', payload: companyFilters})
@@ -196,6 +253,10 @@ class IndexPage extends React.Component {
                           roadMaterial: this.state.roadMaterial,
                           roadLen: this.state.roadLen,
                           pagination: this.state.pagination,
+                          endDate: this.state.endDate,
+                          cptName: this.state.cptName,
+                          cptType: this.state.cptType,
+                          cptLevel: this.state.cptLevel
                         }
                       })
                     }}>查询</Button>
@@ -230,6 +291,7 @@ IndexPage.filterTypes = {
   ],
 }
 IndexPage.filters = [
+  { name: '企业名称', type: 'text'},
   { name: '注册省份', type: 'text'},
   { name: '注册城市', type: 'text'},
   { name: '注册资金(万元)', type: 'number'},
@@ -238,6 +300,7 @@ IndexPage.filters = [
 ]
 
 IndexPage.attrMap = {
+  "企业名称": "companyName",
   "注册省份": "province",
   "注册城市": "city",
   "曾用名称": "nameUsedBefore",
@@ -256,6 +319,19 @@ IndexPage.attrMap = {
   "技术负责人职称": "techLeaderTitle",
   "统一社会信用代码": "creditCode",
 }
+
+IndexPage.CptTitles = [ '爆破与拆除工程', '城市轨道交通工程', '城市及道路照明工程', '城市园林绿化工程', '堤防工程', '公路工程',
+  '地基基础工程', '地基与基础工程', '电力工程', '电力工程施工', '电子与智能化工程', '防腐保温工程', '防腐保温专业承包', '防水防腐保温工程',
+  '房屋建筑工程', '附着升降脚手架金属门窗工程', '工程设计', '管道工程', '港航设备安装及水上交管工程', '钢结构工程', '古建筑工程',
+  '港口与海岸工程', '港口与航道工程', '环保工程', '航道工程', '化工石油工程', '河湖治理工程', '河湖整治工程', '混凝土预制构件',
+  '海洋石油工程', '机场场道', '机电安装', '机电工程', '机电设备安装工程', '计算机信息系统集成企业', '建筑防水工程', '建筑工程',
+  '建筑机电安装工程', '建筑幕墙工程', '建筑业企业', '建筑智能化工程', '建筑装修装饰工程', '矿山工程', '路基', '路面', '炉窑工程',
+  '模板脚手架', '桥梁工程', '起重设备安装工程', '输变电工程', '送变电工程', '隧道工程', '水工大坝工程', '水工金属结构制作与安装工程',
+  '水工建筑物基础处理工程', '施工劳务企业资质', '水工隧洞工程', '施工总承包', '水利水电', '水上交通', '石油化工', '市政工程', '市政公用',
+  '通航建筑工程', '铁路电气化', '铁路电务', '铁路工程', '铁路铺轨架梁', '土石方工程', '通信工程', '体育场地设施', '特种工程',
+  '特种结构补强', '特种专业', '消防设施', '预拌混凝土', '预拌商品混凝土', '冶金工程', '冶炼工程', '园林古建筑工程', '预应力工程',
+  '营业执照', '桥梁工程'
+]
 
 export default connect(({ bm }) => ({
   bm,

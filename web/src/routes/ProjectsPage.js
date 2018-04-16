@@ -13,11 +13,6 @@ class ProjectsPage extends React.Component {
     }
     this.columns = [
       {
-        title: '工程编码',
-        dataIndex: 'proj_id',
-        render: (val) => <span style={{fontSize: '.3em'}}>{val}</span>
-      },
-      {
         title: '工程名称',
         dataIndex: 'projectName',
       },
@@ -43,6 +38,11 @@ class ProjectsPage extends React.Component {
         render: (val) => <span>{val && moment(val).format("YYYY-MM-DD")}</span>
       },
       {
+        title: '交工日期',
+        dataIndex: 'endDate',
+        render: (val) => <span>{val && moment(val).format("YYYY-MM-DD")}</span>
+      },
+      {
         title: '操作',
         fixed: 'right',
         width: 100,
@@ -57,7 +57,7 @@ class ProjectsPage extends React.Component {
     this.props.dispatch({
       type: 'bm/fetchProjects',
       payload: {
-        companyId: this.props.bm.currentCompany.id
+        companyId: this.props.bm.currentCompany.companyId
       }
     })
   }
@@ -77,8 +77,8 @@ class ProjectsPage extends React.Component {
       </Row>)
     }
     return (
-      <div style={{width: '80%', height: '100%', paddingTop: 16}}>
-        <iframe src={`http://glxy.mot.gov.cn/BM/CptInfoAction_base.do?corpCode=${currentCompany.id}`}
+      <div style={{height: '100%', paddingTop: 16}}>
+        <iframe src={`http://glxy.mot.gov.cn/BM/CptInfoAction_base.do?corpCode=${currentCompany.companyId}`}
                 style={{width: '100%', height: this.state.iframeHeigh, border: 'none'}}
                 ref={ref => this.iframe = ref}
                 onLoad={() => {
@@ -93,12 +93,12 @@ class ProjectsPage extends React.Component {
                columns={this.columns}
                rowKey={record => record.proj_id}
                pagination={false}
-               dataSource={projects[currentCompany.id]}
+               dataSource={projects[currentCompany.companyId]}
                loading={false}
                size="small"/>
         <div>
           <a style={{float: 'right', marginTop: 12, marginBottom: 18}}
-             href={`http://glxy.mot.gov.cn/BM/CptInfoAction_outstandingQuery.do?corpCode=${currentCompany.id}&nodeType=MAINPRJ`} target="_blank">原始项目列表</a></div>
+             href={`http://glxy.mot.gov.cn/BM/CptInfoAction_outstandingQuery.do?corpCode=${currentCompany.companyId}&nodeType=MAINPRJ`} target="_blank">原始项目列表</a></div>
       </div>
     );
   }

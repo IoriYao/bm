@@ -1,6 +1,6 @@
 import fetch from 'dva/fetch';
-// let url = 'http://101.132.159.215:5000/bm/'
-let url = '/bm'
+let url = 'http://101.132.159.215:5000/bm/'
+// let url = '/bm'
 function parseJSON(response) {
   return response.json();
 }

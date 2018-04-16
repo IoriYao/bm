@@ -89,10 +89,14 @@ export default {
         }
       })
 
-      let sql = `select SQL_CALC_FOUND_ROWS * from corp_details,
-        (select * from (select corpid,sum(roadLen) as totalLen from corp_proj where projectTypeEnum >=${payload.roadLevel} and roadType = ${payload.roadMaterial} group by corpid) as temp  where totalLen > ${payload.roadLen * 1000})
-        as temp0 where corp_details.id = temp0.corpid ${condition} limit ${(payload.pagination.current - 1 )* payload.pagination.pageSize},${payload.pagination.pageSize};`
-      console.log(sql)
+      let sql = `
+      select SQL_CALC_FOUND_ROWS * from corp_details,
+      ( select * from 
+        ( select corpid,sum(roadLen) as totalLen from corp_proj
+          where projectTypeEnum >=${payload.roadLevel} and roadType = ${payload.roadMaterial} group by corpid) as temp
+        where totalLen > ${payload.roadLen * 1000}) as temp0
+      where corp_details.companyId = temp0.corpid ${condition}
+      limit ${(payload.pagination.current - 1 )* payload.pagination.pageSize},${payload.pagination.pageSize};`
 
       let response = yield call(request, {
         sql: sql
