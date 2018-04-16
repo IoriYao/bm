@@ -35,7 +35,7 @@ export default {
     },
     *fetchCompanies({ payload }, { call, put }) {  // eslint-disable-line
       let response = yield call(request, {
-          sql: `select * from corp_details limit ${(payload.current - 1 )* payload.pageSize},${payload.pageSize};`
+          sql: `select SQL_CALC_FOUND_ROWS * from corp_details limit ${(payload.current - 1 )* payload.pageSize},${payload.pageSize};`
       })
       yield put({
         type: 'saveCompanies',
@@ -88,23 +88,13 @@ export default {
           condition += ` corp_details.${IndexPage.attrMap[filter.name]}${filter.operator}'${filter.value}'`
         }
       })
-      let countSql = `select count(*) from (select * from corp_details,
-        (select * from (select corpid,sum(roadLen) as totalLen from corp_proj where projectTypeEnum >=${payload.roadLevel} and roadType = ${payload.roadMaterial} group by corpid) as temp  where totalLen > ${payload.roadLen})
-        as temp0 where corp_details.id = temp0.corpid ${condition}) as temp1;`
-      let response = yield call(request, {
-        sql: countSql
-      })
-      console.log(response)
-      yield put({
-        type: 'saveCompanyCount',
-        payload: response.data[0]['count(*)']
-      });
-      let sql = `select * from corp_details,
-        (select * from (select corpid,sum(roadLen) as totalLen from corp_proj where projectTypeEnum >=${payload.roadLevel} and roadType = ${payload.roadMaterial} group by corpid) as temp  where totalLen > ${payload.roadLen})
+
+      let sql = `select SQL_CALC_FOUND_ROWS * from corp_details,
+        (select * from (select corpid,sum(roadLen) as totalLen from corp_proj where projectTypeEnum >=${payload.roadLevel} and roadType = ${payload.roadMaterial} group by corpid) as temp  where totalLen > ${payload.roadLen * 1000})
         as temp0 where corp_details.id = temp0.corpid ${condition} limit ${(payload.pagination.current - 1 )* payload.pagination.pageSize},${payload.pagination.pageSize};`
       console.log(sql)
 
-      response = yield call(request, {
+      let response = yield call(request, {
         sql: sql
       })
       console.log(response)
@@ -120,7 +110,8 @@ export default {
       return { ...state, ...action.payload };
     },
     saveCompanies(state, action) {
-      state.companies = action.payload
+      state.companies = action.payload.results || action.payload
+      if (action.payload.count) state.companyCount = action.payload.count
       return {...state}
     },
     saveCompanyCount(state, action) {

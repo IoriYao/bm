@@ -28,6 +28,7 @@ class IndexPage extends React.Component {
       {
         title: '公路长度(km)',
         dataIndex: 'totalLen',
+        render: (val) => <span>{val ? (parseInt(val) / 1000) : '' }</span>
       },
       {
         title: '企业性质',
@@ -64,9 +65,6 @@ class IndexPage extends React.Component {
         </span>,
       }
     ]
-    props.dispatch({
-      type: 'bm/fetchCompanyCount',
-    })
   }
   componentDidMount() {
     this.props.dispatch({
