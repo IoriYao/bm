@@ -16,6 +16,6 @@ from RoadInfoWorker import RoadInfoWorker
 
 roadInfoWorker = RoadInfoWorker()
 
-roadInfoWorker.computelTunnelInfo()
+roadInfoWorker.compute_bridge_info()
 
 

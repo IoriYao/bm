@@ -32,6 +32,12 @@ class SqlWorker(object):
         self.cursor.execute(sql)
         return self.cursor.fetchall()
 
+    def query_all(self, columns, limit=10000):
+        sql = "select %s  from %s limit %s;" % (columns, self.table, limit)
+        print sql
+        self.cursor.execute(sql)
+        return self.cursor.fetchall()
+
     def close(self):
         self.cursor.close()
         self.db.commit()
