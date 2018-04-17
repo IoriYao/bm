@@ -90,8 +90,8 @@ export default {
       })
       let dateCondition = payload.endDate ? ` corp_proj.endDate > '${payload.endDate}' ` : 'true'
       let typeCondition = payload.roadMaterial != '-1' ? ` corp_proj.roadType = ${payload.roadMaterial} ` : true
-      let levelCondition = payload.roadLevel != '-1' ? ` corp_proj.projectTypeEnum = ${payload.roadLevel} ` : true
-      let lengthCondition = payload.roadLen ? `lenMatchCompany.totalLen >= ${payload.roadLen * 1000})` : true
+      let levelCondition = payload.roadLevel != '-1' ? ` corp_proj.projectTypeEnum >= ${payload.roadLevel} ` : true
+      let lengthCondition = payload.roadLen ? `lenMatchCompany.totalLen >= ${payload.roadLen * 1000}` : true
       let cptNameCondition = payload.cptName ? `cptTitle like '%${payload.cptName}%'` : true
       let cptTypeCondition = payload.cptType != -1 ? `(cpttype = '%${payload.cptType}%' or cptTitle like '%${payload.cptType}%')` : true
       let cptLevelCondition = payload.cptLevel != -1 ? `cptlevelEnum >= ${payload.cptLevel}` : true
@@ -118,7 +118,7 @@ export default {
           select SQL_CALC_FOUND_ROWS * from corp_details,
           ( select * from 
             ( select corpid,sum(roadLen) as totalLen from corp_proj where
-              ${dateCondition} and ${typeCondition} and ${levelCondition} group by corpid) as temp
+              ${dateCondition} and ${typeCondition} and ${levelCondition} group by corpid) as lenMatchCompany
             where ${lengthCondition}) as temp0
           where corp_details.companyId = temp0.corpid ${condition} order by totalLen desc
           limit ${(payload.pagination.current - 1 )* payload.pagination.pageSize},${payload.pagination.pageSize};`
