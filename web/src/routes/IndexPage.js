@@ -46,8 +46,9 @@ class IndexPage extends React.Component {
         render: (val) => <span>{val ? (parseInt(val) / 1000) : 0 }</span>
       },
       {
-        title: '企业性质',
-        dataIndex: 'companyNature',
+        title: '最大海拔(km)',
+        dataIndex: 'altitude',
+        render: (val) => <span>{val ? (parseInt(val) / 1000) : 0 }</span>
       },
       {
         title: '城市',
