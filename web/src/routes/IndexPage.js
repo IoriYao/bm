@@ -16,9 +16,11 @@ class IndexPage extends React.Component {
         onChange: (page, pageSiz) => this.onPagination(page, pageSiz),
       },
       roadType: 0,
-      roadLevel: 70,
-      roadMaterial: 0,
+      roadLevel: -1,
+      roadMaterial: -1,
       roadLen: 0,
+      cptLevel: -1,
+      cptType: -1,
     }
     this.columns = [
       {
@@ -67,25 +69,26 @@ class IndexPage extends React.Component {
     ]
   }
   componentDidMount() {
-    this.props.dispatch({
-      type: 'bm/fetchCompanies',
-      payload: this.state.pagination
-    })
+    this.queryCompany()
   }
   onPagination(page, pageSiz) {
     this.state.pagination.current = page
     this.state.pagination.pageSize = pageSiz
+    this.queryCompany()
+  }
 
-    this.props.dispatch({
+  queryCompany() {
+    let { dispatch, bm: { companyFilters } } = this.props
+    dispatch({
       type: 'bm/queryCompanyByType',
       payload: {
-        companyFilters: this.props.bm.companyFilters,
+        companyFilters: companyFilters,
         pagination: this.state.pagination,
         roadType: this.state.roadType,
         roadLevel: this.state.roadLevel,
         roadMaterial: this.state.roadMaterial,
         roadLen: this.state.roadLen,
-        endDate: this.state.endDate,
+        endDate: this.state.endDate && this.state.endDate.format('YYYY-MM-DD'),
         cptName: this.state.cptName,
         cptType: this.state.cptType,
         cptLevel: this.state.cptLevel
@@ -141,10 +144,10 @@ class IndexPage extends React.Component {
   render() {
     let { bm: { companyFilters, companyCount }, dispatch} = this.props
     return (
-      <div style={{height: '100%', paddingTop: 16, marginBottom: 16}}>
+      <div style={{minWidth: 968, height: '100%', paddingTop: 16, marginBottom: 16}}>
         <Card bordered={true} style={{ width: '100%', marginBottom: 16 }}>
           <div style={{display: 'flex', alignItems: 'center'}}>
-            <div style={{whiteSpace: 'nowrap', marginRight: 12}}>项目筛选条件</div>
+            <div style={{whiteSpace: 'nowrap', marginRight: 12, fontWeight: 'bold'}}>项目筛选条件</div>
             <Divider/>
           </div>
           <Row>
@@ -165,34 +168,35 @@ class IndexPage extends React.Component {
             <Col span={12}
                  style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
               <span>等级要求：</span>
-              <Select defaultValue="70" style={{ flex: 1 }}
+              <Select defaultValue="-1" style={{ flex: 1 }}
                       onChange={value => this.setState({roadLevel: value})}>
                 <Select.Option value="100">高速公路</Select.Option>
                 <Select.Option value="90">一级公路及以上</Select.Option>
                 <Select.Option value="80">二级公路及以上</Select.Option>
                 <Select.Option value="70">三级公路及以上</Select.Option>
                 <Select.Option value="60">四级公路及以上</Select.Option>
-                <Select.Option value="50">无要求</Select.Option>
+                <Select.Option value="-1">无要求</Select.Option>
               </Select>
             </Col>
           </Row>
           <Row>
             <Col span={12} style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
               <span>公路类型：</span>
-              <Select defaultValue="0" style={{ flex: 1 }}
+              <Select defaultValue="-1" style={{ flex: 1 }}
                       onChange={value => this.setState({roadMaterial: value})}>
                 <Select.Option value="0">沥青路</Select.Option>
                 <Select.Option value="1">水泥路</Select.Option>
+                <Select.Option value="-1">无要求</Select.Option>
               </Select>
             </Col>
             <Col span={12} style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
               <span>交工日期：</span>
               <DatePicker style={{flex: 1}}
-                          onChange={date=>this.setState({endDate: date.format('yyyy-MM-DD')})} />
+                          onChange={date => this.setState({endDate: date})} />
             </Col>
           </Row>
           <div style={{display: 'flex', alignItems: 'center', marginTop: 18}}>
-            <div style={{whiteSpace: 'nowrap', marginRight: 12}}>资质筛选条件</div>
+            <div style={{whiteSpace: 'nowrap', marginRight: 12, fontWeight: 'bold'}}>资质筛选条件</div>
             <Divider/>
           </div>
           <Row>
@@ -210,29 +214,29 @@ class IndexPage extends React.Component {
             <Col span={8}
                  style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
               <span>资质类型：</span>
-              <Select defaultValue="" style={{ flex: 1 }}
+              <Select defaultValue="-1" style={{ flex: 1 }}
                       onChange={value => this.setState({cptType: value})}>
                 <Select.Option value="总承包">总承包</Select.Option>
                 <Select.Option value="专业承包">专业承包</Select.Option>
-                <Select.Option value="">无</Select.Option>
+                <Select.Option value="-1">无要求</Select.Option>
               </Select>
             </Col>
             <Col span={8}
                  style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
               <span>资质级别：</span>
-              <Select defaultValue="0" style={{ flex: 1 }}
+              <Select defaultValue="-1" style={{ flex: 1 }}
                       onChange={value => this.setState({cptLevel: value})}>
                 <Select.Option value="100">特级</Select.Option>
                 <Select.Option value="90">一级</Select.Option>
                 <Select.Option value="80">二级</Select.Option>
                 <Select.Option value="70">三级</Select.Option>
                 <Select.Option value="60">不分等级</Select.Option>
-                <Select.Option value="0">无</Select.Option>
+                <Select.Option value="-1">无要求</Select.Option>
               </Select>
             </Col>
           </Row>
           <div style={{display: 'flex', alignItems: 'center', marginTop: 18}}>
-            <div style={{whiteSpace: 'nowrap', marginRight: 12}}>基本属性筛选</div>
+            <div style={{whiteSpace: 'nowrap', marginRight: 12, fontWeight: 'bold'}}>基本属性筛选</div>
             <Divider/>
           </div>
           {this.renderFilters()}
@@ -244,21 +248,7 @@ class IndexPage extends React.Component {
             <Button type="primary"
                     onClick={() => {
                       this.state.pagination.current = 1
-                      dispatch({
-                        type: 'bm/queryCompanyByType',
-                        payload: {
-                          companyFilters,
-                          roadType: this.state.roadType,
-                          roadLevel: this.state.roadLevel,
-                          roadMaterial: this.state.roadMaterial,
-                          roadLen: this.state.roadLen,
-                          pagination: this.state.pagination,
-                          endDate: this.state.endDate,
-                          cptName: this.state.cptName,
-                          cptType: this.state.cptType,
-                          cptLevel: this.state.cptLevel
-                        }
-                      })
+                      this.queryCompany()
                     }}>查询</Button>
           </div>
         </Card>
@@ -330,7 +320,7 @@ IndexPage.CptTitles = [ '爆破与拆除工程', '城市轨道交通工程', '�
   '水工建筑物基础处理工程', '施工劳务企业资质', '水工隧洞工程', '施工总承包', '水利水电', '水上交通', '石油化工', '市政工程', '市政公用',
   '通航建筑工程', '铁路电气化', '铁路电务', '铁路工程', '铁路铺轨架梁', '土石方工程', '通信工程', '体育场地设施', '特种工程',
   '特种结构补强', '特种专业', '消防设施', '预拌混凝土', '预拌商品混凝土', '冶金工程', '冶炼工程', '园林古建筑工程', '预应力工程',
-  '营业执照', '桥梁工程'
+  '营业执照',
 ]
 
 export default connect(({ bm }) => ({

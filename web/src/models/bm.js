@@ -88,16 +88,40 @@ export default {
           condition += ` corp_details.${IndexPage.attrMap[filter.name]}${filter.operator}'${filter.value}'`
         }
       })
-
-      let sql = `
-      select SQL_CALC_FOUND_ROWS * from corp_details,
-      ( select * from 
-        ( select corpid,sum(roadLen) as totalLen from corp_proj
-          where projectTypeEnum >=${payload.roadLevel} and roadType = ${payload.roadMaterial} group by corpid) as temp
-        where totalLen > ${payload.roadLen * 1000}) as temp0
-      where corp_details.companyId = temp0.corpid ${condition}
-      limit ${(payload.pagination.current - 1 )* payload.pagination.pageSize},${payload.pagination.pageSize};`
-
+      let dateCondition = payload.endDate ? ` corp_proj.endDate > '${payload.endDate}' ` : 'true'
+      let typeCondition = payload.roadMaterial != '-1' ? ` corp_proj.roadType = ${payload.roadMaterial} ` : true
+      let levelCondition = payload.roadLevel != '-1' ? ` corp_proj.projectTypeEnum = ${payload.roadLevel} ` : true
+      let lengthCondition = payload.roadLen ? `lenMatchCompany.totalLen >= ${payload.roadLen * 1000})` : true
+      let cptNameCondition = payload.cptName ? `cptTitle like '%${payload.cptName}%'` : true
+      let cptTypeCondition = payload.cptType != -1 ? `(cpttype = '%${payload.cptType}%' or cptTitle like '%${payload.cptType}%')` : true
+      let cptLevelCondition = payload.cptLevel != -1 ? `cptlevelEnum >= ${payload.cptLevel}` : true
+      let sql
+      if (cptLevelCondition !== true || cptTypeCondition !== true || cptNameCondition !== true) {
+        sql = `SELECT SQL_CALC_FOUND_ROWS * FROM
+            demo.corp_details,
+              (SELECT corpid, SUM(roadLen) AS totalLen
+                FROM demo.corp_proj, (SELECT corp_id
+                  FROM demo.corp_cpt
+                  WHERE ${cptLevelCondition}
+                      AND ${cptNameCondition}
+                      AND ${cptTypeCondition}
+                  GROUP BY corp_id) AS cptMatchCompany
+                WHERE
+                      cptMatchCompany.corp_id = corp_proj.corpid and
+                      ${dateCondition} and ${typeCondition} and ${levelCondition}
+                  GROUP BY corpid) AS lenMatchCompany
+              WHERE ${lengthCondition} AND lenMatchCompany.corpid = corp_details.companyId ${condition}
+              limit ${(payload.pagination.current - 1 )* payload.pagination.pageSize},${payload.pagination.pageSize};`
+      } else {
+        sql = `
+          select SQL_CALC_FOUND_ROWS * from corp_details,
+          ( select * from 
+            ( select corpid,sum(roadLen) as totalLen from corp_proj where
+              ${dateCondition} and ${typeCondition} and ${levelCondition} group by corpid) as temp
+            where ${lengthCondition}) as temp0
+          where corp_details.companyId = temp0.corpid ${condition}
+          limit ${(payload.pagination.current - 1 )* payload.pagination.pageSize},${payload.pagination.pageSize};`
+      }
       let response = yield call(request, {
         sql: sql
       })
