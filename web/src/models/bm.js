@@ -11,7 +11,7 @@ export default {
     currentCompany: {},
     companyCount: 1000,
     companyFilters: [
-      { name: '注册省份', operator: 'contains', value: ''},
+      { name: '企业名称', operator: 'contains', value: ''},
     ]
   },
 
@@ -91,7 +91,9 @@ export default {
       let dateCondition = payload.endDate ? ` corp_proj.endDate > '${payload.endDate}' ` : 'true'
       let typeCondition = payload.roadMaterial != '-1' ? ` corp_proj.roadType = ${payload.roadMaterial} ` : true
       let levelCondition = payload.roadLevel != '-1' ? ` corp_proj.projectTypeEnum >= ${payload.roadLevel} ` : true
-      let lengthCondition = payload.roadLen ? `lenMatchCompany.totalLen >= ${payload.roadLen * 1000}` : true
+      let roadCondition = payload.roadLen ? `lenMatchCompany.totalLen >= ${payload.roadLen * 1000}` : true
+      let bridgeCondition = payload.bridgeLen ? ` lenMatchCompany.totalLargeBridgeLen >= ${payload.bridgeLen * 1000} ` : true
+      let tunnelCondition = payload.tunnelLen ? ` lenMatchCompany.totalTunnelLen >= ${payload.tunnelLen * 1000} ` : true
       let cptNameCondition = payload.cptName ? `cptTitle like '%${payload.cptName}%'` : true
       let cptTypeCondition = payload.cptType != -1 ? `(cpttype = '%${payload.cptType}%' or cptTitle like '%${payload.cptType}%')` : true
       let cptLevelCondition = payload.cptLevel != -1 ? `cptlevelEnum >= ${payload.cptLevel}` : true
@@ -99,7 +101,9 @@ export default {
       if (cptLevelCondition !== true || cptTypeCondition !== true || cptNameCondition !== true) {
         sql = `SELECT SQL_CALC_FOUND_ROWS * FROM
             demo.corp_details,
-              (SELECT corpid, SUM(roadLen) AS totalLen
+              (SELECT corpid, SUM(roadLen) AS totalLen,
+                      SUM(tunnel_length) AS totalTunnelLen,
+                      SUM(largeBridgeLen) AS totalLargeBridgeLen
                 FROM demo.corp_proj, (SELECT corp_id
                   FROM demo.corp_cpt
                   WHERE ${cptLevelCondition}
@@ -110,16 +114,22 @@ export default {
                       cptMatchCompany.corp_id = corp_proj.corpid and
                       ${dateCondition} and ${typeCondition} and ${levelCondition}
                   GROUP BY corpid) AS lenMatchCompany
-              WHERE ${lengthCondition} AND lenMatchCompany.corpid = corp_details.companyId ${condition}
+              WHERE ${roadCondition} 
+                   AND ${bridgeCondition} 
+                   AND ${tunnelCondition} 
+                   AND lenMatchCompany.corpid = corp_details.companyId ${condition}
               order by totalLen desc
               limit ${(payload.pagination.current - 1 )* payload.pagination.pageSize},${payload.pagination.pageSize};`
       } else {
         sql = `
           select SQL_CALC_FOUND_ROWS * from corp_details,
           ( select * from 
-            ( select corpid,sum(roadLen) as totalLen from corp_proj where
+            ( select corpid,sum(roadLen) as totalLen,
+                     SUM(tunnel_length) AS totalTunnelLen,
+                     SUM(largeBridgeLen) AS totalLargeBridgeLen
+                from corp_proj where
               ${dateCondition} and ${typeCondition} and ${levelCondition} group by corpid) as lenMatchCompany
-            where ${lengthCondition}) as temp0
+            where ${roadCondition} AND ${bridgeCondition} AND ${tunnelCondition}) as temp0
           where corp_details.companyId = temp0.corpid ${condition} order by totalLen desc
           limit ${(payload.pagination.current - 1 )* payload.pagination.pageSize},${payload.pagination.pageSize};`
       }

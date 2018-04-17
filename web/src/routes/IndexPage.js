@@ -15,12 +15,15 @@ class IndexPage extends React.Component {
         showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
         onChange: (page, pageSiz) => this.onPagination(page, pageSiz),
       },
-      roadType: 0,
-      roadLevel: -1,
-      roadMaterial: -1,
+      roadType: '0',
+      roadLevel: '-1',
+      roadMaterial: '-1',
+      tunnelLen: 0,
+      bridgeLen: 0,
       roadLen: 0,
-      cptLevel: -1,
-      cptType: -1,
+      altitude: 0,
+      cptLevel: '-1',
+      cptType: '-1',
     }
     this.columns = [
       {
@@ -28,30 +31,27 @@ class IndexPage extends React.Component {
         dataIndex: 'companyName',
       },
       {
-        title: '公路长度(km)',
+        title: '公路总长度(km)',
         dataIndex: 'totalLen',
-        render: (val) => <span>{val ? (parseInt(val) / 1000) : '' }</span>
+        render: (val) => <span>{val ? (parseInt(val) / 1000) : 0 }</span>
+      },
+      {
+        title: '大桥总长度(km)',
+        dataIndex: 'totalLargeBridgeLen',
+        render: (val) => <span>{val ? (parseInt(val) / 1000) : 0 }</span>
+      },
+      {
+        title: '隧道总长度(km)',
+        dataIndex: 'totalTunnelLen',
+        render: (val) => <span>{val ? (parseInt(val) / 1000) : 0 }</span>
       },
       {
         title: '企业性质',
         dataIndex: 'companyNature',
       },
       {
-        title: '注册省份',
-        dataIndex: 'province',
-      },
-      {
         title: '城市',
         dataIndex: 'city',
-      },
-      {
-        title: '注册资金(万)',
-        dataIndex: 'found',
-      },
-      {
-        title: '成立日期',
-        dataIndex: 'companyCreateDate',
-        render: (val) => <span>{val && moment(val).format("YYYY-MM-DD")}</span>
       },
       {
         title: '操作',
@@ -88,6 +88,9 @@ class IndexPage extends React.Component {
         roadLevel: this.state.roadLevel,
         roadMaterial: this.state.roadMaterial,
         roadLen: this.state.roadLen,
+        bridgeLen: this.state.bridgeLen,
+        tunnelLen: this.state.tunnelLen,
+        altitude: this.state.altitude,
         endDate: this.state.endDate && this.state.endDate.format('YYYY-MM-DD'),
         cptName: this.state.cptName,
         cptType: this.state.cptType,
@@ -118,10 +121,12 @@ class IndexPage extends React.Component {
             {types.map((filterItem, index) =>
               <Select.Option value={filterItem.operator}  key={index}>{filterItem.name}</Select.Option>)}
           </Select>
-          <Input style={{ width: '58%' }} onChange={event => {
-            companyFilters[i].value = event.target.value
-            dispatch({type: 'bm/saveCompanyFilter', payload: companyFilters})
-          }}/>
+          <Input style={{ width: '58%' }}
+                 value={companyFilters[i].value || ''}
+                 onChange={event => {
+                   companyFilters[i].value = event.target.value
+                   dispatch({type: 'bm/saveCompanyFilter', payload: companyFilters})
+                 }}/>
           <Button style={{ width: '12%' }} type="danger" icon='close'
                   onClick={() => {
                     if (companyFilters.length < 2) return
@@ -151,24 +156,49 @@ class IndexPage extends React.Component {
             <Divider/>
           </div>
           <Row>
-            <Col span={12} style={{paddingBottom: 8, display: 'flex'}}>
-              <Select defaultValue="0"
-                      style={{ flex: 3, marginRight: 5 }}
-                      onChange={value => this.setState({roadType: value})}>
-                <Select.Option value="0">公路</Select.Option>
-                <Select.Option value="1" disabled>桥梁</Select.Option>
-                <Select.Option value="2" disabled>隧道</Select.Option>
-              </Select>
+            <Col span={6} style={{paddingBottom: 8, display: 'flex', paddingLeft: 8, alignItems: 'center'}}>
+              <span>公路总长：</span>
               <Input
                 type='number'
                 style={{flex: 7}}
                 addonAfter="km"
+                value={this.state.roadLen}
                 onChange={event => this.setState({roadLen: event.target.value})}/>
             </Col>
-            <Col span={12}
+            <Col span={6} style={{paddingBottom: 8, display: 'flex', paddingLeft: 8, alignItems: 'center'}}>
+              <span>桥梁总长：</span>
+              <Input
+                type='number'
+                style={{flex: 7}}
+                addonAfter="km"
+                value={this.state.bridgeLen}
+                onChange={event => this.setState({bridgeLen: event.target.value})}/>
+            </Col>
+            <Col span={6} style={{paddingBottom: 8, display: 'flex', paddingLeft: 8, alignItems: 'center'}}>
+              <span>隧道总长：</span>
+              <Input
+                type='number'
+                style={{flex: 7}}
+                addonAfter="km"
+                value={this.state.tunnelLen}
+                onChange={event => this.setState({tunnelLen: event.target.value})}/>
+            </Col>
+            <Col span={6} style={{paddingBottom: 8, display: 'flex', paddingLeft: 8, alignItems: 'center'}}>
+              <span>海拔要求：</span>
+              <Input
+                type='number'
+                style={{flex: 7}}
+                addonAfter="km"
+                value={this.state.altitude}
+                onChange={event => this.setState({altitude: event.target.value})}/>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={8}
                  style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
               <span>等级要求：</span>
               <Select defaultValue="-1" style={{ flex: 1 }}
+                      value={this.state.roadLevel}
                       onChange={value => this.setState({roadLevel: value})}>
                 <Select.Option value="100">高速公路</Select.Option>
                 <Select.Option value="90">一级公路及以上</Select.Option>
@@ -178,20 +208,20 @@ class IndexPage extends React.Component {
                 <Select.Option value="-1">无要求</Select.Option>
               </Select>
             </Col>
-          </Row>
-          <Row>
-            <Col span={12} style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
+            <Col span={8} style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
               <span>公路类型：</span>
               <Select defaultValue="-1" style={{ flex: 1 }}
+                      value={this.state.roadMaterial}
                       onChange={value => this.setState({roadMaterial: value})}>
                 <Select.Option value="0">沥青路</Select.Option>
                 <Select.Option value="1">水泥路</Select.Option>
                 <Select.Option value="-1">无要求</Select.Option>
               </Select>
             </Col>
-            <Col span={12} style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
+            <Col span={8} style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
               <span>交工日期：</span>
               <DatePicker style={{flex: 1}}
+                          value={this.state.endDate}
                           onChange={date => this.setState({endDate: date})} />
             </Col>
           </Row>
@@ -204,6 +234,7 @@ class IndexPage extends React.Component {
                  style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
               <span>资质名称：</span>
               <Select style={{ flex: 1 }}
+                      value={this.state.cptName}
                       onChange={value => this.setState({cptName: value})}>
                 {
                   IndexPage.CptTitles.map((title, i) =>
@@ -215,6 +246,7 @@ class IndexPage extends React.Component {
                  style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
               <span>资质类型：</span>
               <Select defaultValue="-1" style={{ flex: 1 }}
+                      value={this.state.cptType}
                       onChange={value => this.setState({cptType: value})}>
                 <Select.Option value="总承包">总承包</Select.Option>
                 <Select.Option value="专业承包">专业承包</Select.Option>
@@ -225,6 +257,7 @@ class IndexPage extends React.Component {
                  style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
               <span>资质级别：</span>
               <Select defaultValue="-1" style={{ flex: 1 }}
+                      value={this.state.cptLevel}
                       onChange={value => this.setState({cptLevel: value})}>
                 <Select.Option value="100">特级</Select.Option>
                 <Select.Option value="90">一级</Select.Option>
@@ -242,9 +275,9 @@ class IndexPage extends React.Component {
           {this.renderFilters()}
           <div style={{width: '100%', display: 'flex', justifyContent: 'space-between'}}>
             <Button icon="plus" type="primary" onClick={() => {
-              companyFilters.push({ name: '注册省份', operator: '=', value: ''})
+              companyFilters.push({ name: '企业名称', operator: '=', value: ''})
               dispatch({type: 'bm/saveCompanyFilter', payload: companyFilters})
-            }}>添加查询条件</Button>
+            }}>添加筛选条件</Button>
             <Button type="primary"
                     onClick={() => {
                       this.state.pagination.current = 1
