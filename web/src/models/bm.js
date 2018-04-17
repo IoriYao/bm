@@ -111,6 +111,7 @@ export default {
                       ${dateCondition} and ${typeCondition} and ${levelCondition}
                   GROUP BY corpid) AS lenMatchCompany
               WHERE ${lengthCondition} AND lenMatchCompany.corpid = corp_details.companyId ${condition}
+              order by totalLen desc
               limit ${(payload.pagination.current - 1 )* payload.pagination.pageSize},${payload.pagination.pageSize};`
       } else {
         sql = `
@@ -119,7 +120,7 @@ export default {
             ( select corpid,sum(roadLen) as totalLen from corp_proj where
               ${dateCondition} and ${typeCondition} and ${levelCondition} group by corpid) as temp
             where ${lengthCondition}) as temp0
-          where corp_details.companyId = temp0.corpid ${condition}
+          where corp_details.companyId = temp0.corpid ${condition} order by totalLen desc
           limit ${(payload.pagination.current - 1 )* payload.pagination.pageSize},${payload.pagination.pageSize};`
       }
       let response = yield call(request, {
