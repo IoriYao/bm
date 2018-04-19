@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'dva';
-import {Button, Col, Divider, Layout, Row, Table} from "antd";
+import {Button, Card, Col, Divider, Layout, Row, Table} from "antd";
 import * as moment from "moment";
 
 class ProjectsPage extends React.Component {
@@ -99,7 +99,6 @@ class ProjectsPage extends React.Component {
 
   render() {
     let { bm: { projects, company } } = this.props
-    console.log('aifneg', company)
     if (projects[this.state.corpId]) {
       this.columns[1].filters = []
       let temp = []
@@ -119,23 +118,26 @@ class ProjectsPage extends React.Component {
       let sorter = this.state.sorter
       displayProjects.sort((a, b) => this.sort(a[sorter.field], b[sorter.field], sorter.order))
     }
-    /*let companyInfoColumns = [];
+    let companyInfoColumns = [];
     for (let key in ProjectsPage.attrMap) {
       companyInfoColumns.push([
-        <Col style={{textAlign: 'right'}}span={6} key={key}>{key}</Col>, <Col span={6} key={key}>{currentCompany[ProjectsPage.attrMap[key]]}</Col>])
+        <Col style={{textAlign: 'right', paddingRight: 16, fontWeight: 'bold'}} span={4} key={key}>{`${key}: `}</Col>
+        , <Col span={8} key={key}>{company[ProjectsPage.attrMap[key]]}</Col>])
     }
     let companyInfoRows = []
     for (let i = 0; i < companyInfoColumns.length; i += 2) {
-      companyInfoRows.push(<Row key={i}>
+      companyInfoRows.push(<Row key={i} style={{marginBottom: 12}}>
         {companyInfoColumns[i]}
         {i + 1 < companyInfoColumns.length ? companyInfoColumns[i + 1] : undefined}
       </Row>)
-    }*/
+    }
     return (
       <div style={{paddingTop: 16, marginLeft: 32, marginRight: 32}}>
-        <iframe src={`http://glxy.mot.gov.cn/BM/CptInfoAction_base.do?corpCode=${this.state.corpId}`}
-                        style={{ border: 'none'}}
-                        ref={ref => this.iframe = ref}/>
+        <Card title={company.companyName}
+              style={{ marginBottom: 16 }}
+              extra={
+                <a href={`http://glxy.mot.gov.cn/BM/CptInfoAction_base.do?corpCode=${this.state.corpId}`}
+                   target="_blank">原始详情</a>}>{companyInfoRows}</Card>
         <Table style={{width: '100%'}}
                columns={this.columns}
                rowKey={record => record.projId}
@@ -161,6 +163,25 @@ class ProjectsPage extends React.Component {
 }
 ProjectsPage.propTypes = {
 };
+ProjectsPage.attrMap = {
+  "注册省份": "province",
+  "注册城市": "city",
+  "曾用名称": "nameUsedBefore",
+  "行政主管部门": "parentDepart",
+  "营业执照注册号": "licenceId",
+  "注册资金(万元)": "found",
+  "企业类型": "companyType",
+  "企业性质": "companyNature",
+  "营业执照注册日期": "licenceRegisterDate",
+  "成立日期": "companyCreateDate",
+  "法定代表人": "corporationPerson",
+  "法定代表人职称": "corporationTitle",
+  "企业负责人": "leader",
+  "企业负责人职称": "leaderTitle",
+  "技术负责人": "technologyLeader",
+  "技术负责人职称": "techLeaderTitle",
+  "统一社会信用代码": "creditCode",
+}
 
 export default connect(({ bm }) => ({
   bm,
