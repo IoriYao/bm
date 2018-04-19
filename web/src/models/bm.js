@@ -44,7 +44,7 @@ export default {
     },
     *fetchProjects({ payload }, { call, put }) {  // eslint-disable-line
       let response = yield call(request, {
-        sql: `select * from corp_proj where corpid='${payload.companyId}';`
+        sql: `select * from corp_proj where corpId='${payload.companyId}';`
       })
       yield put({
         type: 'saveProjects',

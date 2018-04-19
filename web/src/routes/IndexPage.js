@@ -33,7 +33,7 @@ class IndexPage extends React.Component {
       {
         title: '公路总长度(km)',
         dataIndex: 'totalLen',
-        render: (val) => <span>{val ? (parseInt(val) / 1000) : 0 }</span>
+        render: (val) => <span>{val ? (parseInt(val) / 1000) : '0' }</span>
       },
       {
         title: '大桥总长度(km)',
@@ -60,10 +60,7 @@ class IndexPage extends React.Component {
         width: 100,
         render: (val, record) => <span>
           <a onClick={
-            () => {
-              this.props.dispatch({type: 'bm/saveCurrentCompany', payload: record})
-              this.props.dispatch(routerRedux.push('/projects'))
-            }
+            () => this.props.dispatch(routerRedux.push(`/projects?corpId=${encodeURIComponent(record.companyId)}`))
           }>详情</a>
         </span>,
       }
