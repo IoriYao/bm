@@ -30,10 +30,15 @@ def passeCredit(tr):
 def getcredit(id,date):
     url = u"http://glxy.mot.gov.cn/BM/CreditAction_corpList.do"
 
-    req = urllib2.Request(url)
-    data = urllib.urlencode(  { u"corCode" : id,u"corpcode" : id, u"periodcode" : str(date) , u"type" : u"信用信息"}  )
-    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor())
-    html = opener.open(req, data)
+    while True:
+        try:
+            req = urllib2.Request(url)
+            data = urllib.urlencode(  { u"corCode" : id,u"corpcode" : id, u"periodcode" : str(date) , u"type" : u"信用信息"}  )
+            opener = urllib2.build_opener(urllib2.HTTPCookieProcessor())
+            html = opener.open(req, data,timeout=5)
+            break
+        except Exception,e:
+            continue
 
     from bs4 import BeautifulSoup
     bsObj = BeautifulSoup(html, "html.parser")
@@ -52,22 +57,23 @@ if __name__ == "__main__":
 
     db = MySQLdb.connect('101.132.159.215', 'yuyao', 'yy123123', 'demo', charset="utf8")
     cursor = db.cursor()
-    sql = 'select id from corp_details where id = \"13231827-2\";'
-    sql = 'select id from corp_details;'
+    #sql = 'select id,companyId from corp_details where id =16;'
+    sql = 'select id,companyId from corp_details where id >= %s;' %(sys.argv[2])
 
     try:
         cursor.execute(sql)
         results = cursor.fetchall()
         for row in results:
-            corpid = row[0]
-            print corpid
-            h = hash(corpid) % 20
-            if h != int(sys.argv[1]):
+            id = row[0]
+            corpid = row[1]
+            if int(id) % 20 != int(sys.argv[1]):
+                pass
                 continue
+            print id, corpid,sys.argv[1],sys.argv[2]
             try:
                 for date in [ 2009,2010,2011,2012,2013,2014,2015,2016,2017,2018]:
                     res = getcredit(corpid, date)
-                    print res
+                    print date, res
                     for info in res:
                         tmp = info + (corpid,)
                         tempsql = "INSERT INTO demo.corp_credit VALUES( \"%s\",%d,%d,\"%s\");" % tmp
