@@ -102,7 +102,7 @@ export default {
         sql = `SELECT SQL_CALC_FOUND_ROWS * FROM
             demo.corp_details,
               (SELECT corpid, SUM(roadLen) AS totalLen,
-                      SUM(tunnel_length) AS totalTunnelLen,
+                      SUM(tunnelLen) AS totalTunnelLen,
                       SUM(largeBridgeLen) AS totalLargeBridgeLen
                 FROM demo.corp_proj, (SELECT corp_id
                   FROM demo.corp_cpt
@@ -125,7 +125,7 @@ export default {
           select SQL_CALC_FOUND_ROWS * from corp_details,
           ( select * from 
             ( select corpid,sum(roadLen) as totalLen,
-                     SUM(tunnel_length) AS totalTunnelLen,
+                     SUM(tunnelLen) AS totalTunnelLen,
                      SUM(largeBridgeLen) AS totalLargeBridgeLen
                 from corp_proj where
               ${dateCondition} and ${typeCondition} and ${levelCondition} group by corpid) as lenMatchCompany
