@@ -98,7 +98,8 @@ class ProjectsPage extends React.Component {
   }
 
   render() {
-    let { bm: { projects } } = this.props
+    let { bm: { projects, company } } = this.props
+    console.log('aifneg', company)
     if (projects[this.state.corpId]) {
       this.columns[1].filters = []
       let temp = []
@@ -133,18 +134,8 @@ class ProjectsPage extends React.Component {
     return (
       <div style={{paddingTop: 16, marginLeft: 32, marginRight: 32}}>
         <iframe src={`http://glxy.mot.gov.cn/BM/CptInfoAction_base.do?corpCode=${this.state.corpId}`}
-                        style={{width: '100%', height: this.state.iframeHeigh, border: 'none'}}
-                        ref={ref => this.iframe = ref}
-                        onLoad={() => {
-                          let btn = this.iframe.contentDocument.getElementsByName('BtnQuery')[0]
-                          btn && btn.parentNode.removeChild( btn )
-                          setTimeout(() =>
-                            this.setState({
-                              iframeHeigh: this.iframe.contentDocument.body.scrollHeight,
-                              iframeWidth: this.iframe.contentDocument.body.scrollWidth,
-                            })
-                          ), 1000}
-                        }/>
+                        style={{ border: 'none'}}
+                        ref={ref => this.iframe = ref}/>
         <Table style={{width: '100%'}}
                columns={this.columns}
                rowKey={record => record.projId}

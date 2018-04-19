@@ -12,7 +12,8 @@ export default {
     companyCount: 1000,
     companyFilters: [
       { name: '企业名称', operator: 'contains', value: ''},
-    ]
+    ],
+    company: {}
   },
 
   subscriptions: {
@@ -44,6 +45,13 @@ export default {
     },
     *fetchProjects({ payload }, { call, put }) {  // eslint-disable-line
       let response = yield call(request, {
+        sql: `select * from corp_details where companyId='${payload.companyId}';`
+      })
+      yield put({
+        type: 'saveCompany',
+        payload: response.data && response.data[0]
+      })
+      response = yield call(request, {
         sql: `select * from corp_proj where corpId='${payload.companyId}';`
       })
       yield put({
@@ -147,6 +155,10 @@ export default {
   reducers: {
     save(state, action) {
       return { ...state, ...action.payload };
+    },
+    saveCompany(state, action) {
+      state.company = action.payload
+      return {...state}
     },
     saveCompanies(state, action) {
       state.companies = action.payload.results || action.payload
