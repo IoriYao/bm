@@ -100,6 +100,7 @@ export default {
       let typeCondition = payload.roadMaterial != '-1' ? ` corp_proj.roadType = ${payload.roadMaterial} ` : true
       let levelCondition = payload.roadLevel != '-1' ? ` corp_proj.projectTypeEnum >= ${payload.roadLevel} ` : true
       let roadCondition = payload.roadLen ? `lenMatchCompany.totalLen >= ${payload.roadLen * 1000}` : true
+      let roadBaseCondition = payload.roadBedLen ? `lenMatchCompany.totalBedLen >= ${payload.roadBedLen * 1000}` : true
       let bridgeCondition = payload.bridgeLen ? ` lenMatchCompany.totalLargeBridgeLen >= ${payload.bridgeLen * 1000} ` : true
       let tunnelCondition = payload.tunnelLen ? ` lenMatchCompany.totalTunnelLen >= ${payload.tunnelLen * 1000} ` : true
       let cptNameCondition = payload.cptName ? `cptTitle like '%${payload.cptName}%'` : true
@@ -110,6 +111,7 @@ export default {
         sql = `SELECT SQL_CALC_FOUND_ROWS * FROM
             demo.corp_details,
               (SELECT corpid, SUM(roadLen) AS totalLen,
+                      SUM(roadBedLen) AS totalBedLen,
                       SUM(tunnelLen) AS totalTunnelLen,
                       SUM(largeBridgeLen) AS totalLargeBridgeLen
                 FROM demo.corp_proj, (SELECT corp_id
@@ -123,6 +125,7 @@ export default {
                       ${dateCondition} and ${typeCondition} and ${levelCondition}
                   GROUP BY corpid) AS lenMatchCompany
               WHERE ${roadCondition} 
+                   ANF ${roadBaseCondition}
                    AND ${bridgeCondition} 
                    AND ${tunnelCondition} 
                    AND lenMatchCompany.corpid = corp_details.companyId ${condition}
