@@ -1,5 +1,7 @@
 import sys
 
+from CreditSpider import start_credit_spider
+
 reload(sys)
 sys.setdefaultencoding('utf8')
 # companySpider = CompanySpider("70913213-1")
@@ -12,10 +14,12 @@ sys.setdefaultencoding('utf8')
 # from ProjectWorker import ProjectWorker
 #
 # companyWorker = ProjectWorker()
-from RoadInfoWorker import RoadInfoWorker
+# from RoadInfoWorker import RoadInfoWorker
+#
+# roadInfoWorker = RoadInfoWorker()
+#
+# roadInfoWorker.compute_bridge_info()
 
-roadInfoWorker = RoadInfoWorker()
-
-roadInfoWorker.compute_bridge_info()
+start_credit_spider()
 
 

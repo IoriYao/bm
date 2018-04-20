@@ -10,8 +10,12 @@ class SqlWorker(object):
         self.cursor = self.db.cursor()
         self.sqlCount = 0
 
-    def save(self, condition, record):
-        sql = "update %s set %s  where %s" % (self.table, self.__map_to_sql(record), condition)
+    def save(self, record, condition=None):
+        if condition is None:
+            sql = "insert into %s set %s ON DUPLICATE KEY UPDATE %s;"\
+                  % (self.table, self.__map_to_sql(record), self.__map_to_sql(record))
+        else:
+            sql = "update %s set %s  where %s" % (self.table, self.__map_to_sql(record), condition)
         print sql
         try:
             self.cursor.execute(sql)
