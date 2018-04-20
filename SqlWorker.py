@@ -4,17 +4,22 @@ from logs import log
 
 
 class SqlWorker(object):
+    db = None
+    cursor = None
 
     def __init__(self, table):
         self.table = table
+        self.sqlCount = 0
+        self.connect()
+
+    def connect(self):
         self.db = MySQLdb.connect('101.132.159.215', 'yuyao', 'yy123123', 'demo')
         self.db.set_character_set('utf8')
         self.cursor = self.db.cursor()
-        self.sqlCount = 0
 
     def save(self, record, condition=None):
         if condition is None:
-            sql = "insert into %s set %s ON DUPLICATE KEY UPDATE %s;"\
+            sql = "insert into %s set %s ON DUPLICATE KEY UPDATE %s;" \
                   % (self.table, self.__map_to_sql(record), self.__map_to_sql(record))
         else:
             sql = "update %s set %s  where %s" % (self.table, self.__map_to_sql(record), condition)
@@ -22,8 +27,11 @@ class SqlWorker(object):
         try:
             self.cursor.execute(sql)
             self.sqlCount += 1
-        except:
+        except Exception, e:
+            log('-------------------------------------')
+            print e
             self.cursor.close()
+            self.connect()
             self.cursor = self.db.cursor()
             return
         log(self.sqlCount)
