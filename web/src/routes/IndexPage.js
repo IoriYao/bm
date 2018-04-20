@@ -31,8 +31,13 @@ class IndexPage extends React.Component {
         dataIndex: 'companyName',
       },
       {
-        title: '公路总长度(km)',
+        title: '路面总长度(km)',
         dataIndex: 'totalLen',
+        render: (val) => <span>{val ? (parseInt(val) / 1000) : '0' }</span>
+      },
+      {
+        title: '路基总长度(km)',
+        dataIndex: 'totalBaseLen',
         render: (val) => <span>{val ? (parseInt(val) / 1000) : '0' }</span>
       },
       {
@@ -155,7 +160,16 @@ class IndexPage extends React.Component {
           </div>
           <Row>
             <Col span={6} style={{paddingBottom: 8, display: 'flex', paddingLeft: 8, alignItems: 'center'}}>
-              <span>公路总长：</span>
+              <span>路面总长：</span>
+              <Input
+                type='number'
+                style={{flex: 7}}
+                addonAfter="km"
+                value={this.state.roadLen}
+                onChange={event => this.setState({roadLen: event.target.value})}/>
+            </Col>
+            <Col span={6} style={{paddingBottom: 8, display: 'flex', paddingLeft: 8, alignItems: 'center'}}>
+              <span>路基总长：</span>
               <Input
                 type='number'
                 style={{flex: 7}}
@@ -315,9 +329,14 @@ IndexPage.filters = [
   { name: '企业名称', type: 'text'},
   { name: '注册省份', type: 'text'},
   { name: '注册城市', type: 'text'},
-  { name: '注册资金(万元)', type: 'number'},
   { name: '企业类型', type: 'text'},
   { name: '企业性质', type: 'text'},
+  { name: '注册资金(万元)', type: 'number'},
+  { name: '路面总长(km)', type: 'number'},
+  { name: '路基总长(km)', type: 'number'},
+  { name: '桥梁总长(km)', type: 'number'},
+  { name: '隧道总长(km)', type: 'number'},
+  { name: '最高海拔(km)', type: 'number'},
 ]
 
 IndexPage.attrMap = {

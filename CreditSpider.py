@@ -3,6 +3,7 @@ import threading
 
 from HtmlSpider import open_url, print_dict
 from SqlWorker import SqlWorker
+from logs import log
 
 __author__ = 'afnan'
 __attr_map = {
@@ -58,8 +59,12 @@ def __start_workers(corps, credit_sql_worker, worker_count=5):
 def __start_work(corps, credit_sql_worker):
     for corp in corps:
         for time in __years:
-            html_doc = open_url(__base_url,
-                                {'corpcode': corp[0], 'corCode': corp[0], 'type': '信用信息', 'periodcode': time})
+            try:
+                html_doc = open_url(__base_url,
+                                    {'corpcode': corp[0], 'corCode': corp[0], 'type': '信用信息', 'periodcode': time})
+            except Exception, e:
+                log(e.message)
+                continue
             for credit_info in __parse_credit_html(html_doc):
                 credit_info['corp_id'] = corp[0]
                 credit_info['level'] = __level_map[credit_info['levelStr']]

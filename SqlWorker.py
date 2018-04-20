@@ -1,5 +1,7 @@
 import MySQLdb
 
+from logs import log
+
 
 class SqlWorker(object):
 
@@ -16,7 +18,7 @@ class SqlWorker(object):
                   % (self.table, self.__map_to_sql(record), self.__map_to_sql(record))
         else:
             sql = "update %s set %s  where %s" % (self.table, self.__map_to_sql(record), condition)
-        print sql
+        log(sql)
         try:
             self.cursor.execute(sql)
             self.sqlCount += 1
@@ -24,7 +26,7 @@ class SqlWorker(object):
             self.cursor.close()
             self.cursor = self.db.cursor()
             return
-        print self.sqlCount
+        log(self.sqlCount)
         if self.sqlCount % 10 == 0:
             self.db.commit()
             self.cursor.close()
@@ -32,13 +34,13 @@ class SqlWorker(object):
 
     def query(self, columns, condition, limit=1000):
         sql = "select %s  from %s where %s limit %s;" % (columns, self.table, condition, limit)
-        print sql
+        log(sql)
         self.cursor.execute(sql)
         return self.cursor.fetchall()
 
     def query_all(self, columns, limit=10000):
         sql = "select %s  from %s limit %s;" % (columns, self.table, limit)
-        print sql
+        log(sql)
         self.cursor.execute(sql)
         return self.cursor.fetchall()
 
