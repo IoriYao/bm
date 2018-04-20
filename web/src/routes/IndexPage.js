@@ -91,6 +91,7 @@ class IndexPage extends React.Component {
         roadLevel: this.state.roadLevel,
         roadMaterial: this.state.roadMaterial,
         roadLen: this.state.roadLen,
+        roadBedLen: this.state.roadBedLen,
         bridgeLen: this.state.bridgeLen,
         tunnelLen: this.state.tunnelLen,
         altitude: this.state.altitude,
@@ -164,6 +165,7 @@ class IndexPage extends React.Component {
               <Input
                 type='number'
                 style={{flex: 7}}
+                addonBefore=">="
                 addonAfter="km"
                 value={this.state.roadLen}
                 onChange={event => this.setState({roadLen: event.target.value})}/>
@@ -173,15 +175,17 @@ class IndexPage extends React.Component {
               <Input
                 type='number'
                 style={{flex: 7}}
+                addonBefore=">="
                 addonAfter="km"
-                value={this.state.roadLen}
-                onChange={event => this.setState({roadLen: event.target.value})}/>
+                value={this.state.roadBedLen}
+                onChange={event => this.setState({roadBedLen: event.target.value})}/>
             </Col>
             <Col span={6} style={{paddingBottom: 8, display: 'flex', paddingLeft: 8, alignItems: 'center'}}>
               <span>桥梁总长：</span>
               <Input
                 type='number'
                 style={{flex: 7}}
+                addonBefore=">="
                 addonAfter="km"
                 value={this.state.bridgeLen}
                 onChange={event => this.setState({bridgeLen: event.target.value})}/>
@@ -191,22 +195,24 @@ class IndexPage extends React.Component {
               <Input
                 type='number'
                 style={{flex: 7}}
+                addonBefore=">="
                 addonAfter="km"
                 value={this.state.tunnelLen}
                 onChange={event => this.setState({tunnelLen: event.target.value})}/>
             </Col>
+          </Row>
+          <Row>
             <Col span={6} style={{paddingBottom: 8, display: 'flex', paddingLeft: 8, alignItems: 'center'}}>
               <span>海拔要求：</span>
               <Input
                 type='number'
                 style={{flex: 7}}
+                addonBefore=">="
                 addonAfter="km"
                 value={this.state.altitude}
                 onChange={event => this.setState({altitude: event.target.value})}/>
             </Col>
-          </Row>
-          <Row>
-            <Col span={8}
+            <Col span={6}
                  style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
               <span>等级要求：</span>
               <Select defaultValue="-1" style={{ flex: 1 }}
@@ -220,7 +226,7 @@ class IndexPage extends React.Component {
                 <Select.Option value="-1">无要求</Select.Option>
               </Select>
             </Col>
-            <Col span={8} style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
+            <Col span={6} style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
               <span>公路类型：</span>
               <Select defaultValue="-1" style={{ flex: 1 }}
                       value={this.state.roadMaterial}
@@ -230,7 +236,7 @@ class IndexPage extends React.Component {
                 <Select.Option value="-1">无要求</Select.Option>
               </Select>
             </Col>
-            <Col span={8} style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
+            <Col span={6} style={{display: 'flex', alignItems: 'center', paddingLeft: 8}}>
               <span>交工日期：</span>
               <DatePicker style={{flex: 1}}
                           value={this.state.endDate}
@@ -332,11 +338,6 @@ IndexPage.filters = [
   { name: '企业类型', type: 'text'},
   { name: '企业性质', type: 'text'},
   { name: '注册资金(万元)', type: 'number'},
-  { name: '路面总长(km)', type: 'number'},
-  { name: '路基总长(km)', type: 'number'},
-  { name: '桥梁总长(km)', type: 'number'},
-  { name: '隧道总长(km)', type: 'number'},
-  { name: '最高海拔(km)', type: 'number'},
 ]
 
 IndexPage.attrMap = {

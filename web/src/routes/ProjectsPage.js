@@ -30,7 +30,7 @@ class ProjectsPage extends React.Component {
       },
       {
         title: '路基(km)',
-        dataIndex: 'roadBaseLen',
+        dataIndex: 'roadBedLen',
         render: (val) => <span>{val ? (parseInt(val) / 1000) : '0' }</span>,
         sorter: true,
       },
@@ -133,11 +133,12 @@ class ProjectsPage extends React.Component {
     }
     return (
       <div style={{paddingTop: 16, marginLeft: 32, marginRight: 32}}>
-        <Card title={company.companyName}
-              style={{ marginBottom: 16 }}
-              extra={
-                <a href={`http://glxy.mot.gov.cn/BM/CptInfoAction_base.do?corpCode=${this.state.corpId}`}
-                   target="_blank">原始详情</a>}>{companyInfoRows}</Card>
+        <Card style={{ marginBottom: 16 }}>
+          <a href={`http://glxy.mot.gov.cn/BM/CptInfoAction_base.do?corpCode=${this.state.corpId}`}
+             style={{fontSize: '1.1em'}}
+             target="_blank">{company.companyName}</a>
+          <Divider style={{marginTop: 12}}/>
+          {companyInfoRows}</Card>
         <Table style={{width: '100%'}}
                columns={this.columns}
                rowKey={record => record.projId}
