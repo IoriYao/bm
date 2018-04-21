@@ -9,7 +9,7 @@ __author__ = 'afnan'
 __attr_map = {
     "评价省份": "province",
     "评价年份": "date",
-    "等级": "levelStr",
+    "等级": "rateStr",
     # "等级": "level",
     # "企业id": "corp_id"
 }
@@ -29,7 +29,7 @@ __level_map = {
 }
 __base_url = 'http://glxy.mot.gov.cn/BM/CreditAction_corpList.do'
 __years = ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017']
-__thread_count = 5
+__thread_count = 10
 
 
 def start_credit_spider():
@@ -42,6 +42,7 @@ def start_credit_spider():
 
 
 def __start_workers(corps, credit_sql_worker, worker_count=5):
+    log('total %d' % len(corps))
     if len(corps) % worker_count is 0:
         group_count = len(corps) / worker_count
     else:
@@ -55,20 +56,26 @@ def __start_workers(corps, credit_sql_worker, worker_count=5):
         _thread.join()
 
 
-
 def __start_work(corps, credit_sql_worker):
+    log('work for count: %d' % len(corps))
+    i = 0
     for corp in corps:
+        i += 1
+        log('work for: %d/%d' % (i, len(corps)))
         for time in __years:
             try:
                 html_doc = open_url(__base_url,
                                     {'corpcode': corp[0], 'corCode': corp[0], 'type': '信用信息', 'periodcode': time})
             except Exception, e:
+                log('--------------------')
+                log(e)
                 log(e.message)
                 continue
             for credit_info in __parse_credit_html(html_doc):
                 credit_info['corp_id'] = corp[0]
-                credit_info['level'] = __level_map[credit_info['levelStr']]
+                credit_info['rating'] = __level_map[credit_info['rateStr']]
                 credit_sql_worker.save(credit_info)
+    log('work done!')
 
 
 def __parse_credit_html(html_doc):

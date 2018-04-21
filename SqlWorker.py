@@ -1,3 +1,5 @@
+import threading
+
 import MySQLdb
 
 from logs import log
@@ -10,12 +12,15 @@ class SqlWorker(object):
     def __init__(self, table):
         self.table = table
         self.sqlCount = 0
+        self.lock = threading.Lock()
         self.connect()
 
     def connect(self):
+        self.lock.acquire()
         self.db = MySQLdb.connect('101.132.159.215', 'yuyao', 'yy123123', 'demo')
         self.db.set_character_set('utf8')
         self.cursor = self.db.cursor()
+        self.lock.release()
 
     def save(self, record, condition=None):
         if condition is None:
@@ -24,6 +29,7 @@ class SqlWorker(object):
         else:
             sql = "update %s set %s  where %s" % (self.table, self.__map_to_sql(record), condition)
         log(sql)
+        self.lock.acquire()
         try:
             self.cursor.execute(sql)
             self.sqlCount += 1
@@ -33,12 +39,14 @@ class SqlWorker(object):
             self.cursor.close()
             self.connect()
             self.cursor = self.db.cursor()
+            self.lock.release()
             return
         log(self.sqlCount)
         if self.sqlCount % 10 == 0:
             self.db.commit()
             self.cursor.close()
             self.cursor = self.db.cursor()
+        self.lock.release()
 
     def query(self, columns, condition, limit=1000):
         sql = "select %s  from %s where %s limit %s;" % (columns, self.table, condition, limit)
