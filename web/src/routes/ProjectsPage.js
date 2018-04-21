@@ -17,7 +17,7 @@ class ProjectsPage extends React.Component {
       {
         title: '工程名称',
         dataIndex: 'projectName',
-        width: 420
+        width: 360
       },
       {
         title: '省份',
@@ -98,7 +98,7 @@ class ProjectsPage extends React.Component {
   }
 
   render() {
-    let { bm: { projects, company } } = this.props
+    let { bm: { projects, company, credits } } = this.props
     if (projects[this.state.corpId]) {
       this.columns[1].filters = []
       let temp = []
@@ -122,7 +122,7 @@ class ProjectsPage extends React.Component {
     for (let key in ProjectsPage.attrMap) {
       companyInfoColumns.push([
         <Col style={{textAlign: 'right', paddingRight: 16, fontWeight: 'bold'}} span={4} key={key}>{`${key}: `}</Col>
-        , <Col span={8} key={key}>{company[ProjectsPage.attrMap[key]]}</Col>])
+        , <Col span={8} key={company[ProjectsPage.attrMap[key]]}>{company[ProjectsPage.attrMap[key]]}</Col>])
     }
     let companyInfoRows = []
     for (let i = 0; i < companyInfoColumns.length; i += 2) {
@@ -138,8 +138,19 @@ class ProjectsPage extends React.Component {
              style={{fontSize: '1.1em'}}
              target="_blank">{company.companyName}</a>
           <Divider style={{marginTop: 12}}/>
-          {companyInfoRows}</Card>
+          {companyInfoRows}
+        </Card>
+        <Table style={{width: '100%', marginBottom: 16}}
+               title={() => '信用等级'}
+               columns={credits.columns}
+               rowKey={record => record.year}
+               bordered={true}
+               pagination={false}
+               dataSource={credits.data}
+               loading={false}
+               size='small'/>
         <Table style={{width: '100%'}}
+               title={() => '项目列表'}
                columns={this.columns}
                rowKey={record => record.projId}
                pagination={false}

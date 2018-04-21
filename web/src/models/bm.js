@@ -13,7 +13,8 @@ export default {
     companyFilters: [
       { name: '企业名称', operator: 'contains', value: ''},
     ],
-    company: {}
+    company: {},
+    credits: {}
   },
 
   subscriptions: {
@@ -50,6 +51,13 @@ export default {
       yield put({
         type: 'saveCompany',
         payload: response.data && response.data[0]
+      })
+      response = yield call(request, {
+        sql: `select * from corp_credit where corp_id='${payload.companyId}';`
+      })
+      yield put({
+        type: 'saveCredits',
+        payload: response.data
       })
       response = yield call(request, {
         sql: `select * from corp_proj where corpId='${payload.companyId}';`
@@ -166,6 +174,36 @@ export default {
     saveCompanies(state, action) {
       state.companies = action.payload.results || action.payload
       if (action.payload.count) state.companyCount = action.payload.count
+      return {...state}
+    },
+    saveCredits(state, action) {
+      let credit = {
+        columns: [],
+        rows: [],
+        data: []
+      }
+      action.payload.forEach(item => {
+        if (credit.columns.indexOf(item.province) === -1) credit.columns.push(item.province)
+        if (credit.rows.indexOf(item.date) === -1) credit.rows.push(item.date)
+      })
+      credit.rows.sort((a, b) => a - b)
+      credit.rows.forEach(date =>{
+        let rowData = {year: date}
+        credit.columns.forEach(province => {
+          action.payload.forEach(item => {
+            if (item.date === date && province === item.province) {
+              rowData[province] = item.rateStr
+              return
+            }
+          })
+        })
+        credit.data.push(rowData)
+      })
+      credit.columns = credit.columns.map(province => {
+        return {title: province, dataIndex: province, align: 'center'}
+      })
+      credit.columns.unshift({title: '时间', dataIndex: 'year'})
+      state.credits = credit
       return {...state}
     },
     saveCompanyCount(state, action) {

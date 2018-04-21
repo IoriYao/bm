@@ -153,7 +153,7 @@ class IndexPage extends React.Component {
   render() {
     let { bm: { companyFilters, companyCount }, dispatch} = this.props
     return (
-      <div style={{minWidth: 968, height: '100%', paddingTop: 16, marginBottom: 16}}>
+      <div style={{minWidth: 968, height: '100%', paddingTop: 16, marginBottom: 16, marginLeft: 32, marginRight: 32}}>
         <Card bordered={true} style={{ width: '100%', marginBottom: 16 }}>
           <div style={{display: 'flex', alignItems: 'center'}}>
             <div style={{whiteSpace: 'nowrap', marginRight: 12, fontWeight: 'bold'}}>项目筛选条件</div>

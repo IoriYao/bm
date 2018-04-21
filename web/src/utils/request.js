@@ -1,6 +1,6 @@
 import fetch from 'dva/fetch';
-// let url = 'http://101.132.159.215:5000/bm/'
-let url = '/bm'
+let url = 'http://101.132.159.215:5000/bm/'
+// let url = '/bm'
 function parseJSON(response) {
   return response.json();
 }
@@ -27,7 +27,8 @@ export default function request(payload) {
   return fetch(url, {
     method: 'post',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
     },
     body: JSON.stringify(payload),
   })
